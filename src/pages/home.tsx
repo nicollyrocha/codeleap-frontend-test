@@ -14,6 +14,7 @@ export const Home = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [loadingModal, setLoadingModal] = useState(false);
+  const [creating, setCreating] = useState(false);
   const [likes, setLikes] = useState<Set<number>>(new Set());
 
   useEffect(() => {
@@ -25,10 +26,15 @@ export const Home = () => {
   }, []);
 
   const handleCreatePost = async () => {
-    const data = await createPost(username, title, content);
-    setPosts((prevPosts) => [data, ...prevPosts]);
-    setTitle("");
-    setContent("");
+    setCreating(true);
+    try {
+      const data = await createPost(username, title, content);
+      setPosts((prevPosts) => [data, ...prevPosts]);
+      setTitle("");
+      setContent("");
+    } finally {
+      setCreating(false);
+    }
   };
 
   const handleDeletePost = async (id: number) => {
@@ -90,7 +96,8 @@ export const Home = () => {
               <Button
                 text="Create"
                 onClick={handleCreatePost}
-                disabled={title === "" || content === ""}
+                loading={creating}
+                disabled={creating || title === "" || content === ""}
               />
             </div>
           </div>
